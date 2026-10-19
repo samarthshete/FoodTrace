@@ -1,0 +1,115 @@
+{
+ "product": {
+  "gtin": "0049000028911",
+  "name": "Diet Coke Soft Drink",
+  "brand": "Coke",
+  "image_url": null,
+  "ingredients_text": null,
+  "nova_group": 4,
+  "is_organic": false,
+  "stale": false,
+  "score": {
+   "engine_version": "0.1.0",
+   "status": "not_scored",
+   "total": null,
+   "band": null,
+   "confidence": 0.56,
+   "missing_inputs": [
+    "sugars_g",
+    "saturated_fat_g",
+    "fiber_g",
+    "fvl_percent"
+   ],
+   "nutriscore": {
+    "class": "beverage",
+    "score": null,
+    "grade": null
+   },
+   "components": {
+    "nutrition": {
+     "weight": 60,
+     "value": null,
+     "known": false
+    },
+    "additives": {
+     "weight": 30,
+     "value": 0.6,
+     "known": true
+    },
+    "processing": {
+     "weight": 10,
+     "value": 0.0,
+     "known": true
+    }
+   }
+  },
+  "attribution": "Data from Open Food Facts (ODbL)"
+ },
+ "breakdown": {
+  "gtin": "0049000028911",
+  "score": {
+   "engine_version": "0.1.0",
+   "status": "not_scored",
+   "total": null,
+   "band": null,
+   "confidence": 0.56,
+   "missing_inputs": [
+    "sugars_g",
+    "saturated_fat_g",
+    "fiber_g",
+    "fvl_percent"
+   ],
+   "nutriscore": {
+    "class": "beverage",
+    "score": null,
+    "grade": null
+   },
+   "components": {
+    "nutrition": {
+     "weight": 60,
+     "value": null,
+     "known": false
+    },
+    "additives": {
+     "weight": 30,
+     "value": 0.6,
+     "known": true
+    },
+    "processing": {
+     "weight": 10,
+     "value": 0.0,
+     "known": true
+    }
+   },
+   "breakdown": [
+    {
+     "rule_id": "additives.e338",
+     "component": "additives",
+     "points": -0.4,
+     "input_value": {
+      "name": "E338 - Phosphoric acid",
+      "risk_level": 3,
+      "evidence_grade": "A"
+     },
+     "source_url": "https://world.openfoodfacts.org/facets/additives/e338",
+     "estimated": false,
+     "note": "EFSA: high estimated overexposure risk."
+    },
+    {
+     "rule_id": "processing.nova",
+     "component": "processing",
+     "points": 0.0,
+     "input_value": 4,
+     "source_url": "https://world.openfoodfacts.org/nova",
+     "estimated": false,
+     "note": "NOVA 4: ultra-processed food."
+    }
+   ]
+  },
+  "explanation": [
+   "Not scored: the label data is missing sugars, saturated fat, fibre, fruit/vegetable share.",
+   "E338 - Phosphoric acid: EFSA: high estimated overexposure risk.",
+   "Processing: NOVA 4: ultra-processed food."
+  ]
+ }
+}

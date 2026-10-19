@@ -1,0 +1,96 @@
+name: Data refresh
+
+# Keeps the hosted database fresh (specs/020). Inert until the DATABASE_URL secret is set.
+on:
+  schedule:
+    - cron: "0 7 * * *" # daily: recalls (OPS-1)
+    - cron: "0 6 * * 1" # Mondays: full refresh (OPS-1)
+  workflow_dispatch:
+    inputs:
+      job:
+        description: Which refresh to run
+        type: choice
+        options: [recalls, full]
+        default: recalls
+
+permissions:
+  contents: read
+
+concurrency: # OPS-4: never overlap
+  group: data-refresh
+  cancel-in-progress: false
+
+jobs:
+  recalls:
+    if: github.event.schedule == '0 7 * * *' || (github.event_name == 'workflow_dispatch' && inputs.job == 'recalls')
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      OFF_CONTACT: ${{ vars.OFF_CONTACT }}
+    steps:
+      - name: Check setup (OPS-2)
+        id: setup
+        run: |
+          if [ -z "$DATABASE_URL" ]; then
+            echo "skipped: no DATABASE_URL secret"; echo "ready=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          fi
+      - uses: actions/checkout@v4
+        if: steps.setup.outputs.ready == 'true'
+      - uses: astral-sh/setup-uv@d0cc045d04ccac9d8b7881df0226f9e82c39688e # v6
+        if: steps.setup.outputs.ready == 'true'
+      - if: steps.setup.outputs.ready == 'true'
+        run: uv sync --frozen --no-dev
+      - name: Migrate
+        if: steps.setup.outputs.ready == 'true'
+        run: uv run alembic upgrade head
+      - name: Sync openFDA recalls
+        if: steps.setup.outputs.ready == 'true'
+        run: uv run python -m pipeline.recalls
+
+  full:
+    if: github.event.schedule == '0 6 * * 1' || (github.event_name == 'workflow_dispatch' && inputs.job == 'full')
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    env:
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      OFF_CONTACT: ${{ vars.OFF_CONTACT }}
+      USDA_BRANDED_ZIP_URL: ${{ vars.USDA_BRANDED_ZIP_URL }}
+    steps:
+      - name: Check setup (OPS-2)
+        id: setup
+        run: |
+          if [ -z "$DATABASE_URL" ]; then
+            echo "skipped: no DATABASE_URL secret"; echo "ready=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          fi
+      - uses: actions/checkout@v4
+        if: steps.setup.outputs.ready == 'true'
+      - uses: astral-sh/setup-uv@d0cc045d04ccac9d8b7881df0226f9e82c39688e # v6
+        if: steps.setup.outputs.ready == 'true'
+      - if: steps.setup.outputs.ready == 'true'
+        run: uv sync --frozen --no-dev
+      - name: Migrate
+        if: steps.setup.outputs.ready == 'true'
+        run: uv run alembic upgrade head
+      - name: Additives reference (OFF taxonomy + FDA)
+        if: steps.setup.outputs.ready == 'true'
+        run: uv run python -m pipeline.reference --refresh
+      - name: USDA Branded Foods (OPS-3)
+        if: steps.setup.outputs.ready == 'true'
+        run: |
+          if [ -n "$USDA_BRANDED_ZIP_URL" ]; then
+            mkdir -p data/usda
+            curl -sSfL -A "FoodTrace/0.1 ($OFF_CONTACT)" -o data/usda/branded.zip "$USDA_BRANDED_ZIP_URL"
+          else
+            echo "no USDA_BRANDED_ZIP_URL variable: importing Open Food Facts alone"
+          fi
+      - name: Bulk import and re-score
+        if: steps.setup.outputs.ready == 'true'
+        run: uv run python -m pipeline.off_bulk --refresh
+      - name: Sync openFDA recalls
+        if: steps.setup.outputs.ready == 'true'
+        run: uv run python -m pipeline.recalls

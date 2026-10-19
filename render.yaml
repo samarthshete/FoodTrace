@@ -1,0 +1,28 @@
+# Render Blueprint for the API (specs/021). Free plan: sleeps after 15 idle minutes,
+# then wakes on the next request (~1 minute). Secrets are entered in the Render dashboard.
+services:
+  - type: web
+    name: foodtrace-api
+    runtime: docker
+    plan: free
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /health
+    autoDeploy: true
+    branch: main
+    envVars:
+      - key: DATABASE_URL # postgresql+asyncpg://… (Supabase session pooler, port 5432)
+        sync: false
+      - key: OFF_CONTACT # your email, for the Open Food Facts User-Agent
+        sync: false
+      - key: USDA_API_KEY # free at https://api.data.gov/signup
+        sync: false
+      - key: AUTH_JWKS_URL # https://<your-web-domain>/api/auth/jwks
+        sync: false
+      - key: AUTH_ISSUER # https://<your-web-domain>
+        sync: false
+      - key: AUTH_AUDIENCE # https://<your-web-domain>
+        sync: false
+      - key: OFF_USER # optional: lets users share contributions with OFF
+        sync: false
+      - key: OFF_PASSWORD
+        sync: false

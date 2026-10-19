@@ -1,0 +1,27 @@
+# data and secrets
+data/
+reports/
+.env
+.env.*
+!.env.example
+
+# python
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.hypothesis/
+dist/
+
+# web
+node_modules/
+web/.next/
+web/out/
+web/test-results/
+web/playwright-report/
+
+.DS_Store
+.coverage
+coverage.xml

@@ -1,0 +1,4 @@
+# Alembic requires module-level `revision`, `down_revision`, ... in each migration, which
+# CodeQL reports as unused globals. Migrations are plain DDL, so they're left out of analysis.
+paths-ignore:
+  - api/migrations

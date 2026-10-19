@@ -1,0 +1,49 @@
+# Runs before each commit (install once: uv run pre-commit install --install-hooks).
+# CI runs the same checks, so the hooks just catch problems earlier.
+default_install_hook_types: [pre-commit, commit-msg]
+default_stages: [pre-commit]
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-merge-conflict
+      - id: check-added-large-files
+        args: [--maxkb=500]
+      - id: detect-private-key
+
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.14.0
+    hooks:
+      - id: ruff-check
+        args: [--fix]
+      - id: ruff-format
+
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.28.0
+    hooks:
+      - id: gitleaks
+
+  - repo: https://github.com/compilerla/conventional-pre-commit
+    rev: v4.2.0
+    hooks:
+      - id: conventional-pre-commit
+        stages: [commit-msg]
+        args: [feat, fix, docs, test, refactor, perf, chore, ci, build]
+
+  - repo: local
+    hooks:
+      - id: mypy
+        name: mypy (strict)
+        entry: uv run mypy api pipeline
+        language: system
+        types: [python]
+        pass_filenames: false
+      - id: eslint
+        name: eslint (web)
+        entry: bash -c 'cd web && ./node_modules/.bin/eslint'
+        language: system
+        files: ^web/.*\.(ts|tsx|mjs)$
+        pass_filenames: false

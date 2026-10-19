@@ -1,0 +1,176 @@
+{
+ "product": {
+  "gtin": "4006381333931",
+  "name": "Orange Juice",
+  "brand": "Sunny",
+  "image_url": null,
+  "ingredients_text": "Orange juice",
+  "nova_group": null,
+  "is_organic": false,
+  "stale": true,
+  "score": {
+   "engine_version": "0.1.0",
+   "status": "scored",
+   "total": 80,
+   "band": {
+    "id": "excellent",
+    "label": "Excellent"
+   },
+   "confidence": 0.89,
+   "missing_inputs": [
+    "nova_group"
+   ],
+   "nutriscore": {
+    "class": "beverage",
+    "score": 4,
+    "grade": "c"
+   },
+   "components": {
+    "nutrition": {
+     "weight": 60,
+     "value": 0.6944,
+     "known": true
+    },
+    "additives": {
+     "weight": 30,
+     "value": 1.0,
+     "known": true
+    },
+    "processing": {
+     "weight": 10,
+     "value": null,
+     "known": false
+    }
+   }
+  },
+  "attribution": "Data from Open Food Facts (ODbL)"
+ },
+ "breakdown": {
+  "gtin": "4006381333931",
+  "score": {
+   "engine_version": "0.1.0",
+   "status": "scored",
+   "total": 80,
+   "band": {
+    "id": "excellent",
+    "label": "Excellent"
+   },
+   "confidence": 0.89,
+   "missing_inputs": [
+    "nova_group"
+   ],
+   "nutriscore": {
+    "class": "beverage",
+    "score": 4,
+    "grade": "c"
+   },
+   "components": {
+    "nutrition": {
+     "weight": 60,
+     "value": 0.6944,
+     "known": true
+    },
+    "additives": {
+     "weight": 30,
+     "value": 1.0,
+     "known": true
+    },
+    "processing": {
+     "weight": 10,
+     "value": null,
+     "known": false
+    }
+   },
+   "breakdown": [
+    {
+     "rule_id": "nutriscore.beverage.energy",
+     "component": "nutrition",
+     "points": 3,
+     "input_value": 190,
+     "source_url": "https://edepot.wur.nl/629571",
+     "estimated": false
+    },
+    {
+     "rule_id": "nutriscore.beverage.sugars",
+     "component": "nutrition",
+     "points": 7,
+     "input_value": 9,
+     "source_url": "https://edepot.wur.nl/629571",
+     "estimated": false
+    },
+    {
+     "rule_id": "nutriscore.beverage.saturated_fat",
+     "component": "nutrition",
+     "points": 0,
+     "input_value": 0,
+     "source_url": "https://edepot.wur.nl/629571",
+     "estimated": false
+    },
+    {
+     "rule_id": "nutriscore.beverage.salt",
+     "component": "nutrition",
+     "points": 0,
+     "input_value": 0,
+     "source_url": "https://edepot.wur.nl/629571",
+     "estimated": false
+    },
+    {
+     "rule_id": "nutriscore.beverage.sweeteners",
+     "component": "nutrition",
+     "points": 0,
+     "input_value": false,
+     "source_url": "https://edepot.wur.nl/629571",
+     "estimated": false
+    },
+    {
+     "rule_id": "nutriscore.beverage.proteins",
+     "component": "nutrition",
+     "points": 0,
+     "input_value": 0.7,
+     "source_url": "https://edepot.wur.nl/629571",
+     "estimated": false
+    },
+    {
+     "rule_id": "nutriscore.beverage.fiber",
+     "component": "nutrition",
+     "points": 0,
+     "input_value": 0.2,
+     "source_url": "https://edepot.wur.nl/629571",
+     "estimated": false
+    },
+    {
+     "rule_id": "nutriscore.beverage.fvl",
+     "component": "nutrition",
+     "points": -6,
+     "input_value": 100,
+     "source_url": "https://edepot.wur.nl/629571",
+     "estimated": false
+    },
+    {
+     "rule_id": "component.nutrition",
+     "component": "nutrition",
+     "points": 46.29,
+     "input_value": 0.6944,
+     "source_url": "/methodology#nutrition",
+     "estimated": false
+    },
+    {
+     "rule_id": "component.additives",
+     "component": "additives",
+     "points": 33.33,
+     "input_value": 1.0,
+     "source_url": "/methodology#additives",
+     "estimated": false
+    }
+   ]
+  },
+  "explanation": [
+   "Scores 80 out of 100 (Excellent).",
+   "Nutri-Score 2023 grade C, scored as a drink.",
+   "Lowered by sugars: 9 g per 100 ml.",
+   "Lowered by energy: 190 kJ per 100 ml.",
+   "Helped by fruit, vegetables and legumes: 100% per 100 ml.",
+   "Some data is missing (processing level), so this score is less certain."
+  ]
+ }
+}

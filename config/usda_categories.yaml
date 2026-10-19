@@ -1,0 +1,91 @@
+# USDA Branded Foods `branded_food_category` → Open Food Facts category tags (specs/012,
+# USDA-2). The tags drive the Nutri-Score class (config/scoring.yaml, nutriscore.classes).
+# Matching is case-insensitive and ignores runs of spaces and the dash used ("-", "–").
+# Categories not listed here are general foods.
+
+tags:
+  # Drinks
+  Soda: [en:beverages, en:sodas]
+  Water: [en:beverages] # plain and flavoured waters are mixed here, so never the water class
+  Packaged Water: [en:beverages]
+  Plant Based Water: [en:beverages]
+  Fruit & Vegetable Juice, Nectars & Fruit Drinks: [en:beverages, en:juices-and-nectars]
+  Fruit Juice - Ready to Drink (Shelf Stable): [en:beverages, en:juices-and-nectars]
+  Other Drinks: [en:beverages]
+  Drinks: [en:beverages]
+  Drinks Flavoured - Ready to Drink: [en:beverages]
+  Energy, Protein & Muscle Recovery Drinks: [en:beverages, en:energy-drinks]
+  Sport Drinks: [en:beverages, en:sports-drinks]
+  Iced & Bottle Tea: [en:beverages, en:iced-teas]
+  Breakfast Drinks: [en:beverages]
+  Non Alcoholic Beverages - Ready to Drink: [en:beverages]
+  Milk: [en:beverages, en:milks]
+  Milk/Milk Substitutes: [en:beverages, en:milks]
+  Plant Based Milk: [en:beverages, en:plant-based-milks]
+
+  # Cheese
+  Cheese: [en:cheeses]
+  Cheese/Cheese Substitutes: [en:cheeses]
+  Processed Cheese & Cheese Novelties: [en:cheeses]
+
+  # Fats, oils, nuts and seeds
+  Vegetable & Cooking Oils: [en:fats, en:vegetable-oils]
+  Oils Edible: [en:fats, en:vegetable-oils]
+  Oils Edible - Vegetable or Plant (Shelf Stable): [en:fats, en:vegetable-oils]
+  Fats Edible: [en:fats]
+  Butter & Spread: [en:fats, en:butters]
+  Butter/Butter Substitutes: [en:fats, en:butters]
+  Cream: [en:creams]
+  Cream/Cream Substitutes: [en:creams]
+  Nut & Seed Butters: [en:nut-butters]
+  Nuts/Seeds - Prepared/Processed: [en:nuts]
+  Nuts/Seeds - Prepared/Processed (Shelf Stable): [en:nuts]
+  Nuts/Seeds - Prepared/Processed (Out of Shell): [en:nuts]
+
+  # Common foods, for alternatives and readable categories
+  Cereal: [en:breakfast-cereals]
+  Yogurt: [en:yogurts]
+  Ice Cream & Frozen Yogurt: [en:frozen-desserts, en:ice-creams]
+  Candy: [en:confectioneries]
+  Chocolate: [en:chocolates]
+  Cookies & Biscuits: [en:biscuits]
+  Chips, Pretzels & Snacks: [en:salty-snacks]
+  Snack, Energy & Granola Bars: [en:snacks, en:cereal-bars]
+  Breads & Buns: [en:breads]
+  Pepperoni, Salami & Cold Cuts: [en:meats, en:prepared-meats]
+  Sausages, Hotdogs & Brats: [en:meats, en:sausages]
+  Bacon, Sausages & Ribs: [en:meats, en:prepared-meats]
+
+# USDA-3: never imported or scored (not food, or outside Nutri-Score's scope).
+exclude:
+  - Alcohol
+  - Alcoholic Beverages
+  - Beer
+  - Baby/Infant - Foods/Beverages
+  - Specialty Formula Supplements
+  - Meal Replacement Supplements
+  - Children's Nutritional Supplements
+  - Vitamins
+  - Vitamins/Minerals/Nutritional Supplements
+  - Minerals
+  - Green Supplements
+  - Herbal Supplements
+  - Digestive & Fiber Supplements
+  - Fatty Acid Supplements
+  - Antioxidant Supplements
+  - Amino Acid Supplements
+  - Ayurvedic Supplements
+  - Nutritional Supplements
+  - Children's Natural Remedies
+  - Weight Control
+  - Health Care
+  - Oral Hygiene Products
+  - Skin Care Preparations
+  - Home Decoration & Supplies
+  - Kitchen Supplies
+  - Baking Accessories
+  - Media
+  - Gardening
+  - Childcare
+  - Other Pet Food
+  - Food/Beverage/Tobacco Variety Packs

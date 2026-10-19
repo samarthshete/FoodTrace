@@ -1,0 +1,220 @@
+{
+ "product": {
+  "gtin": "0036000291452",
+  "name": "Crunchy Oat Bars",
+  "brand": "Acme Foods",
+  "image_url": null,
+  "ingredients_text": "Oats, sugar, salt, sodium nitrite, citric acid",
+  "nova_group": 4,
+  "is_organic": false,
+  "stale": false,
+  "score": {
+   "engine_version": "0.1.0",
+   "status": "scored",
+   "total": 49,
+   "band": {
+    "id": "mediocre",
+    "label": "Mediocre"
+   },
+   "confidence": 0.89,
+   "missing_inputs": [],
+   "nutriscore": {
+    "class": "general",
+    "score": 11,
+    "grade": "d"
+   },
+   "components": {
+    "nutrition": {
+     "weight": 60,
+     "value": 0.6111,
+     "known": true
+    },
+    "additives": {
+     "weight": 30,
+     "value": 0.6,
+     "known": true
+    },
+    "processing": {
+     "weight": 10,
+     "value": 0.0,
+     "known": true
+    }
+   }
+  },
+  "attribution": "Data from Open Food Facts (ODbL)"
+ },
+ "breakdown": {
+  "gtin": "0036000291452",
+  "score": {
+   "engine_version": "0.1.0",
+   "status": "scored",
+   "total": 49,
+   "band": {
+    "id": "mediocre",
+    "label": "Mediocre"
+   },
+   "confidence": 0.89,
+   "missing_inputs": [],
+   "nutriscore": {
+    "class": "general",
+    "score": 11,
+    "grade": "d"
+   },
+   "components": {
+    "nutrition": {
+     "weight": 60,
+     "value": 0.6111,
+     "known": true
+    },
+    "additives": {
+     "weight": 30,
+     "value": 0.6,
+     "known": true
+    },
+    "processing": {
+     "weight": 10,
+     "value": 0.0,
+     "known": true
+    }
+   },
+   "breakdown": [
+    {
+     "rule_id": "nutriscore.general.energy",
+     "component": "nutrition",
+     "points": 4,
+     "input_value": 1500,
+     "source_url": "https://mpc.gouvernement.lu/dam-assets/le-minist%C3%A8re/consodur/2022-main-algorithm-report-update-final.pdf",
+     "estimated": false
+    },
+    {
+     "rule_id": "nutriscore.general.sugars",
+     "component": "nutrition",
+     "points": 3,
+     "input_value": 12,
+     "source_url": "https://mpc.gouvernement.lu/dam-assets/le-minist%C3%A8re/consodur/2022-main-algorithm-report-update-final.pdf",
+     "estimated": false
+    },
+    {
+     "rule_id": "nutriscore.general.saturated_fat",
+     "component": "nutrition",
+     "points": 2,
+     "input_value": 2.5,
+     "source_url": "https://mpc.gouvernement.lu/dam-assets/le-minist%C3%A8re/consodur/2022-main-algorithm-report-update-final.pdf",
+     "estimated": false
+    },
+    {
+     "rule_id": "nutriscore.general.salt",
+     "component": "nutrition",
+     "points": 4,
+     "input_value": 0.9,
+     "source_url": "https://mpc.gouvernement.lu/dam-assets/le-minist%C3%A8re/consodur/2022-main-algorithm-report-update-final.pdf",
+     "estimated": false
+    },
+    {
+     "rule_id": "nutriscore.general.proteins",
+     "component": "nutrition",
+     "points": 0,
+     "input_value": 8,
+     "source_url": "https://mpc.gouvernement.lu/dam-assets/le-minist%C3%A8re/consodur/2022-main-algorithm-report-update-final.pdf",
+     "estimated": false,
+     "note": "Not counted: unfavourable points are too high."
+    },
+    {
+     "rule_id": "nutriscore.general.fiber",
+     "component": "nutrition",
+     "points": -2,
+     "input_value": 4.5,
+     "source_url": "https://mpc.gouvernement.lu/dam-assets/le-minist%C3%A8re/consodur/2022-main-algorithm-report-update-final.pdf",
+     "estimated": false
+    },
+    {
+     "rule_id": "nutriscore.general.fvl",
+     "component": "nutrition",
+     "points": 0,
+     "input_value": 0,
+     "source_url": "https://mpc.gouvernement.lu/dam-assets/le-minist%C3%A8re/consodur/2022-main-algorithm-report-update-final.pdf",
+     "estimated": true
+    },
+    {
+     "rule_id": "additives.e250",
+     "component": "additives",
+     "points": -0.4,
+     "input_value": {
+      "name": "E250 - Sodium nitrite",
+      "risk_level": 3,
+      "evidence_grade": "A"
+     },
+     "source_url": "https://doi.org/10.2903/j.efsa.2017.4786",
+     "estimated": false,
+     "note": "EFSA: high estimated overexposure risk."
+    },
+    {
+     "rule_id": "additives.e330",
+     "component": "additives",
+     "points": 0,
+     "input_value": {
+      "name": "E330 - Citric acid",
+      "risk_level": null,
+      "evidence_grade": "B"
+     },
+     "source_url": "https://world.openfoodfacts.org/facets/additives/e330",
+     "estimated": false,
+     "note": "Not rated: no EFSA overexposure assessment."
+    },
+    {
+     "rule_id": "processing.nova",
+     "component": "processing",
+     "points": 0.0,
+     "input_value": 4,
+     "source_url": "https://world.openfoodfacts.org/nova",
+     "estimated": false,
+     "note": "NOVA 4: ultra-processed food."
+    },
+    {
+     "rule_id": "component.nutrition",
+     "component": "nutrition",
+     "points": 36.67,
+     "input_value": 0.6111,
+     "source_url": "/methodology#nutrition",
+     "estimated": false
+    },
+    {
+     "rule_id": "component.additives",
+     "component": "additives",
+     "points": 18.0,
+     "input_value": 0.6,
+     "source_url": "/methodology#additives",
+     "estimated": false
+    },
+    {
+     "rule_id": "component.processing",
+     "component": "processing",
+     "points": 0.0,
+     "input_value": 0.0,
+     "source_url": "/methodology#processing",
+     "estimated": false
+    },
+    {
+     "rule_id": "additives.cap",
+     "component": "additives",
+     "points": -6,
+     "input_value": 49,
+     "source_url": "https://www.efsa.europa.eu/en/topics/topic/food-additive-re-evaluations",
+     "estimated": false,
+     "note": "An additive with a high EFSA overexposure risk caps the score."
+    }
+   ]
+  },
+  "explanation": [
+   "Scores 49 out of 100 (Mediocre).",
+   "Nutri-Score 2023 grade D, scored as a general food.",
+   "Lowered by energy: 1500 kJ per 100 g.",
+   "Lowered by salt: 0.9 g per 100 g.",
+   "Helped by fibre: 4.5 g per 100 g.",
+   "E250 - Sodium nitrite: EFSA: high estimated overexposure risk.",
+   "Processing: NOVA 4: ultra-processed food.",
+   "Capped at 49 because of an additive's EFSA rating.",
+   "Estimated from the ingredient list: fruit, vegetables and legumes."
+  ]
+ }
+}

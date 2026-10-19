@@ -1,0 +1,149 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  api:
+    runs-on: ubuntu-latest
+    services:
+      db:
+        image: postgres:16
+        env:
+          POSTGRES_USER: ofs
+          POSTGRES_PASSWORD: ofs
+          POSTGRES_DB: ofs_test
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U ofs -d ofs_test"
+          --health-interval 2s --health-timeout 3s --health-retries 30
+    env:
+      CI: "true"
+      TEST_DATABASE_URL: postgresql+asyncpg://ofs:ofs@localhost:5432/ofs_test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+      - run: uv sync --frozen
+      - name: Lint
+        run: uv run ruff check . && uv run ruff format --check .
+      - name: Types
+        run: uv run mypy api pipeline
+      - name: License check (fail on GPL/AGPL; the repo is MIT)
+        run: |
+          uv run pip-licenses --format=csv --fail-on="GNU General Public License v2 (GPLv2);GNU General Public License v3 (GPLv3);GNU Affero General Public License v3;GPL-2.0;GPL-3.0;AGPL-3.0;GPL;AGPL"
+      - name: Tests (unit, integration, spec traceability) with coverage
+        run: uv run pytest -q --cov --cov-report=term
+      - name: Coverage summary
+        if: always()
+        run: |
+          echo "### Python coverage" >> "$GITHUB_STEP_SUMMARY"
+          uv run coverage report --format=markdown >> "$GITHUB_STEP_SUMMARY" || true
+
+  web:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          package_json_file: web/package.json
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+          cache-dependency-path: web/pnpm-lock.yaml
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm lint
+      - run: pnpm typecheck
+      - name: License check (fail on GPL/AGPL; LGPL sharp/libvips is allowed)
+        run: |
+          pnpm licenses list --json | node -e '
+            const d = JSON.parse(require("fs").readFileSync(0, "utf8"));
+            const bad = Object.keys(d).filter((k) => /(^|[^L])GPL/i.test(k));
+            if (bad.length) { console.error("Disallowed licenses:", bad); process.exit(1); }'
+      - name: Tests with coverage
+        run: pnpm exec vitest run --coverage
+      - name: Coverage summary
+        if: always()
+        run: |
+          node -e '
+            const t = require("./coverage/coverage-summary.json").total;
+            const row = (k) => `| ${k} | ${t[k].pct}% (${t[k].covered}/${t[k].total}) |`;
+            console.log(["### Web coverage", "| Metric | Covered |", "| --- | --- |",
+              ...["lines", "statements", "functions", "branches"].map(row)].join("\n"));
+          ' >> "$GITHUB_STEP_SUMMARY" || true
+
+  e2e:
+    runs-on: ubuntu-latest
+    services:
+      db:
+        image: postgres:16
+        env:
+          POSTGRES_USER: ofs
+          POSTGRES_PASSWORD: ofs
+          POSTGRES_DB: ofs_test
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U ofs -d ofs_test"
+          --health-interval 2s --health-timeout 3s --health-retries 30
+    env:
+      E2E_DATABASE_URL: postgresql+asyncpg://ofs:ofs@localhost:5432/ofs_test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+      - run: uv sync --frozen
+      - uses: pnpm/action-setup@v4
+        with:
+          package_json_file: web/package.json
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+          cache-dependency-path: web/pnpm-lock.yaml
+      - run: pnpm install --frozen-lockfile
+        working-directory: web
+      - run: pnpm exec playwright install --with-deps chromium
+        working-directory: web
+      - run: pnpm e2e
+        working-directory: web
+
+  docker:
+    # DEPLOY-2: the API image builds, migrates a fresh database and answers /health.
+    runs-on: ubuntu-latest
+    services:
+      db:
+        image: postgres:16
+        env:
+          POSTGRES_USER: ofs
+          POSTGRES_PASSWORD: ofs
+          POSTGRES_DB: ofs
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U ofs -d ofs"
+          --health-interval 2s --health-timeout 3s --health-retries 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build the API image
+        run: docker build -t foodtrace-api .
+      - name: Start it against Postgres
+        run: |
+          docker run -d --name api --network host -e PORT=8080 \
+            -e DATABASE_URL=postgresql+asyncpg://ofs:ofs@127.0.0.1:5432/ofs foodtrace-api
+          for i in $(seq 1 60); do
+            curl -sf http://127.0.0.1:8080/health && break
+            sleep 2
+          done
+          curl -sf http://127.0.0.1:8080/health
+          curl -sf http://127.0.0.1:8080/methodology | grep -q engine_version
+      - name: Container logs
+        if: always()
+        run: docker logs api || true
+      - name: Runs as a non-root user
+        run: test "$(docker inspect -f '{{.Config.User}}' foodtrace-api)" = "app"

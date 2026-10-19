@@ -1,0 +1,256 @@
+# Scoring configuration. Any change above the "Not scoring" line must bump engine_version
+# and add a changelog line in specs/005-engine.md.
+engine_version: "0.4.1"
+
+weights:
+  nutrition: 60
+  additives: 30
+  processing: 10
+
+# ENGINE-1: nutrition value at each grade's lower boundary (A 1.0-0.8, B 0.8-0.6, ... E 0.2-0).
+nutrition_anchors: {a: 0.8, b: 0.6, c: 0.4, d: 0.2}
+# ENGINE-14: poor nutrition caps the total, as in Yuka.
+nutriscore_cap: {grades: [d, e], total: 49}
+
+bands: # inclusive lower bounds, checked from the top
+  - {id: excellent, label: Excellent, min: 75}
+  - {id: good, label: Good, min: 50}
+  - {id: mediocre, label: Mediocre, min: 25}
+  - {id: poor, label: Poor, min: 0}
+
+nutriscore:
+  source_urls:
+    foods: https://mpc.gouvernement.lu/dam-assets/le-minist%C3%A8re/consodur/2022-main-algorithm-report-update-final.pdf
+    beverages: https://edepot.wur.nl/629571
+
+  # Class detection (NS-1): first matching class wins, in this order.
+  classes:
+    water: # OFF scores other waters (purified, carbonated, flavoured) as beverages
+      - en:spring-waters
+      - en:mineral-waters
+      - en:natural-mineral-waters
+    water_exclude: # a water with any of these tags is scored as a beverage
+      - en:flavored-waters
+      - en:sweetened-waters
+    beverage:
+      - en:beverages
+      - en:waters # waters that aren't spring or mineral water are scored as drinks
+      - en:milks
+      - en:plant-based-milks
+      - en:dairy-drinks
+    beverage_exclude: # these are never beverages, even when tagged so
+      - en:alcoholic-beverages
+      - en:plant-based-yogurts
+      - en:beverage-preparations
+    cheese:
+      - en:cheeses
+    cheese_exclude: # OFF sometimes tags crisps and snacks as cheese; they're general foods
+      - en:crisps
+      - en:salty-snacks
+      - en:snacks
+    fats_oils_nuts_seeds:
+      - en:fats
+      - en:vegetable-oils
+      - en:olive-oils
+      - en:butters
+      - en:margarines
+      - en:creams
+      - en:nuts
+      - en:seeds
+      - en:peanuts
+      - en:nut-butters
+      - en:peanut-butters
+    fats_oils_nuts_seeds_exclude:
+      - en:chestnuts
+
+  # NS-22: in the fats class these oils count as 100% fruit/vegetables/legumes (2023 update).
+  fvl_oil_tags:
+    - en:olive-oils
+    - en:rapeseed-oils
+    - en:canola-oils
+    - en:walnut-oils
+
+  red_meat_tags: # NS-2
+    - en:beef
+    - en:veal-meat
+    - en:pork
+    - en:lamb-meat
+    - en:mutton
+    - en:game-meat
+    - en:horse-meat
+    - en:goat-meat
+    - en:beef-products
+    - en:pork-products
+
+  non_nutritive_sweeteners: # E-numbers that trigger the beverage NNS points (NS-7)
+    - e950
+    - e951
+    - e952
+    - e954
+    - e955
+    - e957
+    - e959
+    - e960
+    - e960a
+    - e961
+    - e962
+    - e969
+
+  # Point tables. A value strictly greater than thresholds[i] earns i+1 points (NS-8).
+  general:
+    energy_kj: [335, 670, 1005, 1340, 1675, 2010, 2345, 2680, 3015, 3350]
+    sugars_g: [3.4, 6.8, 10, 14, 17, 20, 24, 27, 31, 34, 37, 41, 44, 48, 51]
+    saturated_fat_g: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+    salt_g: [0.2, 0.4, 0.6, 0.8, 1, 1.2, 1.4, 1.6, 1.8, 2, 2.2, 2.4, 2.6, 2.8, 3, 3.2, 3.4, 3.6, 3.8, 4]
+    proteins_g: [2.4, 4.8, 7.2, 9.6, 12, 14, 17]
+    fiber_g: [3.0, 4.1, 5.2, 6.3, 7.4]
+    fvl_percent: # [threshold, points]
+      - [40, 1]
+      - [60, 2]
+      - [80, 5]
+    protein_cutoff_a_points: 11 # NS-12
+    red_meat_max_protein_points: 2 # NS-11
+    grades: # upper bounds, inclusive (NS-17)
+      a: 0
+      b: 2
+      c: 10
+      d: 18
+
+  fats_oils_nuts_seeds:
+    energy_from_saturates_kj: [120, 240, 360, 480, 600, 720, 840, 960, 1080, 1200]
+    kj_per_g_saturates: 37
+    # Ratio bands use >= on lower bounds (NS-8): ratio >= 10 -> 1 point ... >= 64 -> 10.
+    saturates_ratio_percent: [10, 16, 22, 28, 34, 40, 46, 52, 58, 64]
+    protein_cutoff_a_points: 7 # NS-14
+    grades:
+      a: -6
+      b: 2
+      c: 10
+      d: 18
+
+  beverage:
+    energy_kj: [30, 90, 150, 210, 240, 270, 300, 330, 360, 390]
+    sugars_g: [0.5, 2, 3.5, 5, 6, 7, 8, 9, 10, 11]
+    proteins_g: [1.2, 1.5, 1.8, 2.1, 2.4, 2.7, 3.0]
+    fvl_percent:
+      - [40, 2]
+      - [60, 4]
+      - [80, 6]
+    sweeteners_points: 4
+    grades: # no A: only water is A (NS-19)
+      b: 2
+      c: 6
+      d: 9
+
+additives:
+  risk_penalty: # by risk_level (ADD-2)
+    0: 0.0
+    1: 0.05
+    2: 0.15
+    3: 0.40
+  evidence_weight: # by evidence_grade
+    A: 1.0
+    B: 0.6
+    C: 0.3
+  cap_total: 49 # ADD-5
+  efsa_source: https://www.efsa.europa.eu/en/topics/topic/food-additive-re-evaluations
+  off_facet_url: https://world.openfoodfacts.org/facets/additives/{code}
+
+processing:
+  source_url: https://world.openfoodfacts.org/nova
+  nova_values:
+    1: 1.0
+    2: 0.67
+    3: 0.33
+    4: 0.0
+
+# Estimates from the ingredient list (specs/014). Matched as whole words, lowercase.
+estimates:
+  source_url: https://world.openfoodfacts.org/nova
+  fvl_source_url: https://mpc.gouvernement.lu/dam-assets/le-minist%C3%A8re/consodur/2022-main-algorithm-report-update-final.pdf
+  # EST-2: fruits, vegetables and legumes. Potatoes, other starchy tubers and nuts don't count
+  # (Nutri-Score 2023).
+  fvl_words: [fruit, fruits, vegetable, vegetables, apple, apples, apricot, apricots, banana,
+    bananas, berries, blackberries, blueberries, cranberries, raspberries, strawberries,
+    cherries, cherry, grape, grapes, raisins, dates, figs, lemon, lemons, lime, limes, mango,
+    mangoes, orange, oranges, peach, peaches, pear, pears, pineapple, plum, plums, prunes,
+    pomegranate, coconut, tomato, tomatoes, carrot, carrots, onion, onions, garlic, celery,
+    spinach, kale, broccoli, cauliflower, cabbage, lettuce, cucumber, cucumbers, zucchini,
+    squash, pumpkin, beet, beets, beetroot, eggplant, artichoke, asparagus, avocado,
+    olives, mushrooms, peppers, jalapeno, jalapenos, peas, beans, chickpeas, lentils,
+    edamame, soybeans, corn]
+  # Ingredients with one of these words are processed derivatives, never fruit/veg.
+  fvl_exclude: [flavor, flavour, flavors, flavoring, extract, oil, starch, protein, fiber,
+    syrup, sugar, lecithin, gum, powder, color, colour, concentrate, potato, potatoes]
+  nova:
+    # EST-3: any of these makes the product NOVA 4 (ultra-processed).
+    ultra_markers: [high fructose corn syrup, corn syrup, glucose syrup, glucose fructose,
+      fructose, dextrose, maltodextrin, invert sugar, hydrogenated, interesterified,
+      modified starch, modified food starch, modified corn starch, protein isolate,
+      isolated soy protein, hydrolyzed, mechanically separated, natural flavor,
+      natural flavors, artificial flavor, artificial flavors, flavoring, flavorings,
+      flavouring, artificial color, artificial colors, color added, caramel color, red 40,
+      yellow 5, yellow 6, blue 1, emulsifier, emulsifiers, mono and diglycerides, lecithin,
+      polysorbate 80, carrageenan, xanthan gum, cellulose gum, sucralose, aspartame,
+      acesulfame potassium, saccharin, monosodium glutamate, disodium inosinate,
+      disodium guanylate, maltitol, sorbitol, guar gum, locust bean gum, gellan gum,
+      gum arabic, acacia gum, annatto, beta carotene, paprika extract, glycerin, whey,
+      whey protein, wheat gluten, vital wheat gluten, lactose, casein, caseinate,
+      sodium caseinate, powdered cellulose, milk protein concentrate, soy protein]
+    # EST-3: processed culinary ingredients (NOVA 2).
+    culinary: [sugar, cane sugar, brown sugar, salt, sea salt, oil, olive oil, vegetable oil,
+      canola oil, sunflower oil, butter, vinegar, honey, maple syrup, molasses, lard,
+      corn starch]
+    ignore: [water, filtered water]
+
+# ---- Not scoring: these sections never change a score, so editing them doesn't bump
+# engine_version.
+
+alternatives: # specs/009
+  min_gain: 5 # ALT-5: points above the base product's total
+  limit: 5 # ALT-6
+  min_confidence: 0.6 # ALT-2: never recommend "Limited data" products
+  fallback_categories: 2 # ALT-4: less specific categories tried after primary_category
+
+recalls: # specs/010
+  window_years: 3 # RECALL-2
+  limit: 3 # RECALL-10
+  # RECALL-7: store brands that sell hundreds of unrelated products. They only match by code.
+  generic_brands:
+    - great value
+    - kirkland signature
+    - kirkland
+    - member's mark
+    - market pantry
+    - good & gather
+    - 365 by whole foods market
+    - "365"
+    - kroger
+    - simple truth
+    - signature select
+    - trader joe's
+    - food lion
+    - publix
+    - h-e-b
+    - hy-vee
+    - meijer
+    - wegmans
+    - equate
+    - up & up
+  # RECALL-6: words that say nothing about which product a recall is about.
+  stop_words: [and, the, with, for, from, original, classic, flavor, flavored, natural,
+               organic, style, brand, size, pack, family, new, made, real, pure, fresh]
+
+# METH-2: one entry per engine_version, newest last. Must match the table in
+# specs/005-engine.md (a test checks it). Documentation only: no effect on scores.
+changelog:
+  - version: "0.1.0"
+    change: "First version: Nutri-Score 2023, OFF-taxonomy additives, NOVA."
+  - version: "0.2.0"
+    change: "Missing fruit/vegetable share and NOVA group are estimated from the ingredient list (spec 014), flagged `estimated`."
+  - version: "0.3.0"
+    change: "Found by the golden gate (spec 015): only spring and mineral waters are in the water class; olive, rapeseed and walnut oils count as 100% fruit/vegetables (NS-22)."
+  - version: "0.4.0"
+    change: "Balanced scoring, as in Yuka: nutrition by Nutri-Score grade (ENGINE-1) and a D/E cap at 49 (ENGINE-14). A typical E product drops about 18 points; A products don't change. Plain-language explanation (ENGINE-15)."
+  - version: "0.4.1"
+    change: "Crisps and snacks are never scored as cheese, even when Open Food Facts tags them so (NS-1)."
