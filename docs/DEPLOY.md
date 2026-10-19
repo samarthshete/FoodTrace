@@ -1,5 +1,8 @@
 # Deploying FoodTrace ($0/month)
 
+The canonical, production-readiness guide is [`DEPLOYMENT_GUIDE.md`](DEPLOYMENT_GUIDE.md).
+This shorter checklist is retained for quick setup.
+
 | Part | Host (free tier) | Config |
 | --- | --- | --- |
 | Database | Supabase Free (500 MB; we stay under 450 MB) | Alembic migrations |
@@ -21,6 +24,8 @@ about a minute. Any container host works the same way with the `Dockerfile`.
    - **Web** (`AUTH_DATABASE_URL`): `postgresql://postgres.<ref>:<password>@<host>:5432/postgres`
 
 The API applies migrations when it starts, including the row-level-security role `ofs_app`.
+Supabase Free can pause low-activity projects and provides no automatic database backups. Follow
+the encrypted logical-backup procedure in `DEPLOYMENT_GUIDE.md` before schema changes.
 
 ## 2. API: Render
 
@@ -32,7 +37,8 @@ The API applies migrations when it starts, including the row-level-security role
    - `AUTH_JWKS_URL`, `AUTH_ISSUER`, `AUTH_AUDIENCE`: your web URL from step 3, e.g.
      `https://foodtrace.vercel.app/api/auth/jwks`, and the URL itself twice.
    - `OFF_USER`, `OFF_PASSWORD`: optional, to let users share contributions with Open Food Facts.
-3. Deploy. Check `https://<api>.onrender.com/health` returns `{"status":"ok"}`.
+3. Deploy. Check both `https://<api>.onrender.com/health` and
+   `https://<api>.onrender.com/ready` return `{"status":"ok"}`.
 
 ## 3. Web: Vercel
 
@@ -67,7 +73,8 @@ Put the client ID and secret into Vercel (step 3) and redeploy.
 
 ## 6. Check it works
 
-- [ ] `<api>/health` is ok, and `<api>/methodology` shows the current `engine_version`.
+- [ ] `<api>/health` and `<api>/ready` are ok, and `<api>/methodology` shows the current
+  `engine_version`.
 - [ ] The web home page loads, and searching "cheerios" suggests products.
 - [ ] A product page shows a score, its rules and sources, and alternatives.
 - [ ] Sign in with Google works, and the account page loads.

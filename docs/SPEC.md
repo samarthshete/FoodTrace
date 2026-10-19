@@ -149,7 +149,7 @@ score = 60·N + 30·A + 10·P,   N, A, P ∈ [0, 1]
 | --- | --- | --- |
 | Web | Vercel or Cloudflare Pages free | No card on file |
 | API | Render free tier, or a home machine + Cloudflare Tunnel | Cold starts accepted |
-| DB | Supabase free (500 MB, pauses after 7 idle days) | ≤ 450 MB; weekly cron keeps it awake |
+| DB | Supabase Free (500 MB, can pause for low activity, no automatic backups) | ≤ 450 MB; daily DB work reduces idle time but is not a guarantee |
 | Photos | Supabase Storage (1 GB) | Compress to < 300 KB; delete after extraction |
 | CI/cron | GitHub Actions | Public repo |
 

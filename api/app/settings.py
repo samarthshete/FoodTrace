@@ -12,7 +12,7 @@ class Settings(BaseSettings):
     response_cache_ttl_s: float = 300  # CACHE-2; 0 turns the cache off
     response_cache_max: int = 2000  # CACHE-4
     off_base_url: str = "https://world.openfoodfacts.org"
-    off_contact: str = "set-OFF_CONTACT-in-.env"
+    off_contact: str = "https://github.com/samarthshete/FoodTrace"
     off_timeout_s: float = 4.0
     cache_days: int = 30
     usda_base_url: str = "https://api.nal.usda.gov"

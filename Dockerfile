@@ -21,7 +21,7 @@ USER app
 
 EXPOSE 8000
 HEALTHCHECK --interval=30s --timeout=5s --start-period=20s \
-  CMD python -c "import os, urllib.request; urllib.request.urlopen(f'http://127.0.0.1:{os.environ[\"PORT\"]}/health', timeout=4)"
+  CMD python -c "import os, urllib.request; urllib.request.urlopen(f'http://127.0.0.1:{os.environ[\"PORT\"]}/ready', timeout=4)"
 
 # Migrations are idempotent, so running them on start keeps a single-instance deploy simple.
 CMD ["sh", "-c", "uv run --no-sync alembic upgrade head && exec uv run --no-sync uvicorn app.main:app --host 0.0.0.0 --port ${PORT} --proxy-headers --forwarded-allow-ips='*'"]

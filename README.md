@@ -124,15 +124,16 @@ cd web && corepack pnpm install && pnpm dev   # web on :3000
 ```
 
 Optional: `scripts/warm-cache.sh` pre-loads popular products into the API's response cache.
-For a free-tier deployment (Render + Vercel + Supabase), see [docs/DEPLOY.md](docs/DEPLOY.md).
+For the complete free-tier deployment and production-readiness procedure, see
+[docs/DEPLOYMENT_GUIDE.md](docs/DEPLOYMENT_GUIDE.md).
 
 ## Testing
 
-**576 automated tests**, plus 69 database integration tests and 11 browser tests that run in CI.
+**577 automated tests**, plus 69 database integration tests and 11 browser tests that run in CI.
 
 | Suite | Command | What it covers |
 | --- | --- | --- |
-| Python | `uv run pytest -q` | Scoring engine, Nutri-Score, additives, barcodes, search, explore, cache, pipeline (316 tests) |
+| Python | `uv run pytest -q` | Scoring engine, Nutri-Score, additives, barcodes, search, explore, cache, pipeline (317 tests) |
 | Golden set | `uv run pytest api/tests/golden -v` | ≥ 99% Nutri-Score agreement with Open Food Facts |
 | Integration | runs in CI with Postgres | The API end to end against a real database |
 | Web | `cd web && pnpm test` | Pages, components, assistant, auth (260 tests) |

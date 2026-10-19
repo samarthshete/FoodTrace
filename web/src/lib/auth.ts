@@ -18,7 +18,14 @@ export function withoutProviderTokens<T extends Record<string, unknown>>(account
 export const authOptions = {
   baseURL: process.env.BETTER_AUTH_URL ?? "http://localhost:3000",
   // Tables come from the API's Alembic migration 0006, not Better Auth's migrator.
-  database: new Pool({ connectionString: process.env.AUTH_DATABASE_URL }),
+  // Keep each serverless instance from exhausting the managed Postgres connection limit.
+  database: new Pool({
+    connectionString: process.env.AUTH_DATABASE_URL,
+    max: 2,
+    idleTimeoutMillis: 10_000,
+    connectionTimeoutMillis: 10_000,
+    allowExitOnIdle: true,
+  }),
   socialProviders: {
     google: {
       clientId: process.env.GOOGLE_CLIENT_ID ?? "",
