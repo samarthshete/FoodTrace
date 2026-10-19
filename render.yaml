@@ -6,8 +6,8 @@ services:
     runtime: docker
     plan: free
     dockerfilePath: ./Dockerfile
-    healthCheckPath: /health
-    autoDeploy: true
+    healthCheckPath: /ready
+    autoDeployTrigger: checksPass
     branch: main
     envVars:
       - key: DATABASE_URL # postgresql+asyncpg://… (Supabase session pooler, port 5432)

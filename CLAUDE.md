@@ -54,7 +54,7 @@ api/tests/       unit/, integration/ (Docker Postgres, OFF mocked with respx), p
 web/             Next.js PWA
 config/scoring.yaml   weights and thresholds; bump engine_version on any change
 data/            raw dumps (gitignored, never committed)
-docs/            SPEC.md, PLAN.md, DEPLOY.md (step-by-step free-tier deploy)
+docs/            SPEC.md, PLAN.md, DEPLOYMENT_GUIDE.md (complete free-tier deploy)
 ```
 
 ## Commands
@@ -114,7 +114,7 @@ Update this section as soon as a command changes.
 - USDA stores barcodes as 14-digit GTINs: search FoodData Central with `gtin.zfill(14)`; the 12- or 13-digit form finds nothing. `DEMO_KEY` allows ~10 requests an hour; set `USDA_API_KEY` (free at api.data.gov) for real use.
 - USDA spells categories inconsistently (`A  B`, `A - B`, `A – B`). `usda_mapping.category_key` normalizes them; key `config/usda_categories.yaml` the same way.
 - The API caches public GET responses in memory (spec 025) and serves the last good copy when the database is unreachable. Responses carry `X-Cache: hit|miss|stale`. Integration tests turn it off via `app.state.response_cache = None`.
-- The Supabase free tier pauses after 7 idle days. The weekly data-refresh job (spec 020) keeps it active.
+- Supabase Free can pause low-activity projects and has no automatic backups. Daily database work reduces idle time but does not guarantee the project stays active; monitor pause notices and follow `docs/DEPLOYMENT_GUIDE.md`.
 - `.github/workflows/data-refresh.yml` does nothing until the repo has a `DATABASE_URL` secret (asyncpg form). Optional: `OFF_CONTACT` and `USDA_BRANDED_ZIP_URL` repository variables.
 - Any scoring change must keep the golden gate at >= 99% (`api/tests/golden`). Run `pipeline.golden` on the full extract and read `reports/golden_mismatches.csv` before changing class tags or thresholds.
 - Nutri-Score has separate rules for general foods, beverages, cheese, and fats/oils/nuts/seeds. Always pass the category.

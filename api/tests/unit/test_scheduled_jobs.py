@@ -21,9 +21,9 @@ def runs(job: dict[str, Any]) -> str:
 @spec("OPS-1")
 def test_daily_recalls_and_weekly_full_refresh(wf: dict[Any, Any]) -> None:
     triggers = wf[True]  # YAML 1.1 reads the `on:` key as True
-    assert [c["cron"] for c in triggers["schedule"]] == ["0 7 * * *", "0 6 * * 1"]
+    assert [c["cron"] for c in triggers["schedule"]] == ["17 7 * * *", "23 6 * * 1"]
     assert "workflow_dispatch" in triggers
-    assert "0 7 * * *" in wf["jobs"]["recalls"]["if"] and "0 6 * * 1" in wf["jobs"]["full"]["if"]
+    assert "17 7 * * *" in wf["jobs"]["recalls"]["if"] and "23 6 * * 1" in wf["jobs"]["full"]["if"]
     assert "pipeline.recalls" in runs(wf["jobs"]["recalls"])
     full = runs(wf["jobs"]["full"])
     order = ["alembic upgrade head", "pipeline.reference --refresh", "pipeline.off_bulk --refresh",

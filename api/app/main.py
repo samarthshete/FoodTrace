@@ -2,7 +2,10 @@ from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 
 import httpx
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
+from fastapi.responses import JSONResponse
+from sqlalchemy import text
+from sqlalchemy.exc import SQLAlchemyError
 
 from app import problems, response_cache
 from app.db.session import make_engine, make_sessionmaker
@@ -50,3 +53,14 @@ app.include_router(methodology.router)
 @app.get("/health")
 async def health() -> dict[str, str]:
     return {"status": "ok"}
+
+
+@app.get("/ready")
+async def ready(request: Request) -> JSONResponse:
+    """Report readiness only when the database accepts a query."""
+    try:
+        async with request.app.state.sessionmaker() as session:
+            await session.execute(text("SELECT 1"))
+    except (AttributeError, OSError, SQLAlchemyError):
+        return JSONResponse({"status": "unavailable"}, status_code=503)
+    return JSONResponse({"status": "ok"})

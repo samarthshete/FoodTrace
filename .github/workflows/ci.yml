@@ -137,10 +137,11 @@ jobs:
           docker run -d --name api --network host -e PORT=8080 \
             -e DATABASE_URL=postgresql+asyncpg://ofs:ofs@127.0.0.1:5432/ofs foodtrace-api
           for i in $(seq 1 60); do
-            curl -sf http://127.0.0.1:8080/health && break
+            curl -sf http://127.0.0.1:8080/ready && break
             sleep 2
           done
           curl -sf http://127.0.0.1:8080/health
+          curl -sf http://127.0.0.1:8080/ready
           curl -sf http://127.0.0.1:8080/methodology | grep -q engine_version
       - name: Container logs
         if: always()
