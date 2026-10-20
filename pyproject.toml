@@ -1,6 +1,6 @@
 [project]
 name = "foodtrace"
-version = "0.1.0"
+version = "0.2.0"
 description = "FoodTrace — AI-Powered Grocery Intelligence Platform with explainable scoring."
 readme = "CLAUDE.md"
 license = "MIT"
