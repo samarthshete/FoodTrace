@@ -1,10 +1,19 @@
+import gzip
 from datetime import UTC, datetime
 from pathlib import Path
 
 import polars as pl
 import pytest
 
-from pipeline.off_bulk import mapped_rows, to_api_product
+from pipeline.off_bulk import (
+    INT_COLUMNS,
+    NUTRIENT_COLUMNS,
+    STRING_COLUMNS,
+    TAG_COLUMNS,
+    extract,
+    mapped_rows,
+    to_api_product,
+)
 
 from .export_rows import export_row, write_extract
 
@@ -100,6 +109,44 @@ def test_allergens_traces_and_diet_analysis_are_imported(tmp_path: Path) -> None
     assert row["allergens"] == ["en:gluten", "en:milk"]
     assert row["traces"] == ["en:nuts"]
     assert row["ingredients_analysis"] == ["en:non-vegan", "en:vegetarian"]
+
+
+@spec("OFF-12")
+def test_renamed_export_columns_still_extract(tmp_path: Path) -> None:
+    row = export_row(GTIN)
+    header = [
+        "code", "countries_tags", "product_name", "brands_en", "ingredients_text",
+        "image_url", "categories_tags", "labels_tags", "additives_tags",
+        "allergens_tags", "traces_tags", "ingredients_analysis_tags",
+        *INT_COLUMNS, *NUTRIENT_COLUMNS, *STRING_COLUMNS,
+    ]  # fmt: skip
+    row["brands_en"] = row["brands"]
+    row["allergens_tags"] = row["allergens"]
+    source = tmp_path / "products.csv.gz"
+    with gzip.open(source, "wt", encoding="utf-8") as f:
+        f.write("\t".join(header) + "\n")
+        f.write("\t".join(row.get(h, "") for h in header) + "\n")
+    out = tmp_path / "us.parquet"
+    extract(source, out)
+    [(product, _, _)] = mapped_rows(out, NOW)
+    assert product["brand"] == "Acme Foods"
+    assert product["allergens"] == ["en:gluten", "en:milk"]
+
+
+@spec("OFF-12")
+def test_a_missing_optional_column_is_empty_not_fatal(tmp_path: Path) -> None:
+    row = export_row(GTIN)
+    header = [h for h in [
+        "code", "countries_tags", "product_name", "ingredients_text", "image_url",
+        *TAG_COLUMNS, *INT_COLUMNS, *NUTRIENT_COLUMNS, *STRING_COLUMNS,
+    ] if h != "allergens"]  # fmt: skip
+    source = tmp_path / "products.csv.gz"
+    with gzip.open(source, "wt", encoding="utf-8") as f:
+        f.write("\t".join(header) + "\n")
+        f.write("\t".join(row.get(h, "") for h in header) + "\n")
+    [(product, _, _)] = mapped_rows(extract(source, tmp_path / "us.parquet"), NOW)
+    assert product["name"] == "Oat Bars" and product["brand"] is None
+    assert product["allergens"] == []
 
 
 @spec("ACC-6")
