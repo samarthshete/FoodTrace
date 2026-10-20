@@ -15,6 +15,10 @@ export remotely, but anonymous range requests are rate-limited there.
   fatal.
 - **OFF-2** Kept rows have `en:united-states` as one of their `countries_tags`, an exact tag
   match. Obsolete products aren't in the export.
+- **OFF-12** A needed column missing from the export header is empty, not a crash. `brands`
+  is read from `brands`, then `brands_en`, then `brands_tags`. `allergens` is read from
+  `allergens`, then `allergens_tags`. The Open Food Facts dump dropped the free-text
+  `brands` and `allergens` columns after 2026-10-12.
 
 ## Mapping
 

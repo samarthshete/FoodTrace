@@ -32,11 +32,16 @@ EXPORT_URL = "https://static.openfoodfacts.org/data/en.openfoodfacts.org.product
 EXPORT = Path("data/off/products.csv.gz")
 EXTRACT = Path("data/off/us.parquet")
 COUNTRY = "en:united-states"
-# Columns kept, checked against the export's header on 2026-10-12. Tag columns are
+# Columns kept, checked against the export's header on 2026-10-20. Tag columns are
 # comma-separated; nutrient columns are per 100 g.
 TEXT_COLUMNS = ["code", "product_name", "brands", "ingredients_text", "image_url"]
 TAG_COLUMNS = ["categories_tags", "labels_tags", "additives_tags", "allergens", "traces_tags",
                "ingredients_analysis_tags"]  # fmt: skip
+# OFF dump header as of 2026-10-20: free-text `brands` and `allergens` were replaced.
+COLUMN_ALIASES: dict[str, tuple[str, ...]] = {
+    "brands": ("brands", "brands_en", "brands_tags"),
+    "allergens": ("allergens", "allergens_tags"),
+}
 INT_COLUMNS = ["nova_group", "last_modified_t", "unique_scans_n", "nutriscore_score"]
 NUTRIENT_COLUMNS = [
     "energy-kj_100g", "energy-kcal_100g", "energy_100g", "fat_100g", "saturated-fat_100g",
@@ -80,6 +85,27 @@ def _tags(raw: str) -> list[str]:
     return [t for t in raw.split(",") if t]
 
 
+def _column_index(header: list[str]) -> dict[str, int]:
+    """Map logical column names onto the export header, including OFF aliases (OFF-12)."""
+    raw = {name: i for i, name in enumerate(header)}
+    names = ["countries_tags", *TEXT_COLUMNS, *TAG_COLUMNS, *INT_COLUMNS, *NUTRIENT_COLUMNS,
+             *STRING_COLUMNS]  # fmt: skip
+    at: dict[str, int] = {}
+    for name in names:
+        for alias in COLUMN_ALIASES.get(name, (name,)):
+            if alias in raw:
+                at[name] = raw[alias]
+                break
+    return at
+
+
+def _cell(fields: list[str], at: dict[str, int], name: str) -> str:
+    i = at.get(name)
+    if i is None or i >= len(fields):
+        return ""
+    return fields[i]
+
+
 def extract(source: Path = EXPORT, dest: Path = EXTRACT) -> Path:
     """Stream the export and keep US rows and the needed columns (OFF-1, OFF-2)."""
     csv.field_size_limit(sys.maxsize)
@@ -88,19 +114,19 @@ def extract(source: Path = EXPORT, dest: Path = EXTRACT) -> Path:
     with gzip.open(source, "rt", encoding="utf-8", errors="replace", newline="") as f:
         reader = csv.reader(f, delimiter="\t", quoting=csv.QUOTE_NONE)
         header = next(reader)
-        at = {name: i for i, name in enumerate(header)}
-        country = at["countries_tags"]
+        at = _column_index(header)
         for fields in reader:
-            if len(fields) != len(header) or COUNTRY not in fields[country].split(","):
+            countries = _cell(fields, at, "countries_tags").split(",")
+            if len(fields) != len(header) or COUNTRY not in countries:
                 continue
             for c in TEXT_COLUMNS + STRING_COLUMNS:
-                columns[c].append(fields[at[c]] or None)
+                columns[c].append(_cell(fields, at, c) or None)
             for c in TAG_COLUMNS:
-                columns[c].append(_tags(fields[at[c]]))
+                columns[c].append(_tags(_cell(fields, at, c)))
             for c in INT_COLUMNS:
-                columns[c].append(_int(fields[at[c]]))
+                columns[c].append(_int(_cell(fields, at, c)))
             for c in NUTRIENT_COLUMNS:
-                columns[c].append(_float(fields[at[c]]))
+                columns[c].append(_float(_cell(fields, at, c)))
     schema: dict[str, Any] = {c: pl.String for c in TEXT_COLUMNS + STRING_COLUMNS}
     schema |= {c: pl.List(pl.String) for c in TAG_COLUMNS}
     schema |= {c: pl.Int64 for c in INT_COLUMNS} | {c: pl.Float64 for c in NUTRIENT_COLUMNS}
