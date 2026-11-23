@@ -26,8 +26,8 @@ jobs:
       CI: "true"
       TEST_DATABASE_URL: postgresql+asyncpg://ofs:ofs@localhost:5432/ofs_test
     steps:
-      - uses: actions/checkout@v4
-      - uses: astral-sh/setup-uv@v6
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v7
       - run: uv sync --frozen
       - name: Lint
         run: uv run ruff check . && uv run ruff format --check .
@@ -50,11 +50,11 @@ jobs:
       run:
         working-directory: web
     steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
         with:
           package_json_file: web/package.json
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: 24
           cache: pnpm
@@ -96,13 +96,13 @@ jobs:
     env:
       E2E_DATABASE_URL: postgresql+asyncpg://ofs:ofs@localhost:5432/ofs_test
     steps:
-      - uses: actions/checkout@v4
-      - uses: astral-sh/setup-uv@v6
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v7
       - run: uv sync --frozen
-      - uses: pnpm/action-setup@v4
+      - uses: pnpm/action-setup@v6
         with:
           package_json_file: web/package.json
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: 24
           cache: pnpm
@@ -129,7 +129,7 @@ jobs:
           --health-cmd "pg_isready -U ofs -d ofs"
           --health-interval 2s --health-timeout 3s --health-retries 30
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Build the API image
         run: docker build -t foodtrace-api .
       - name: Start it against Postgres
